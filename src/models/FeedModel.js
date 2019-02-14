@@ -2,7 +2,7 @@ require('dotenv').config();
 
 let mongoose = require('mongoose');
 
-mongoose.connect(process.env.MONGO_HOST).then(() => {
+mongoose.connect(process.env.MONGO_HOST, { useNewUrlParser: true }).then(() => {
   console.log('Connected to database');
 });
 
