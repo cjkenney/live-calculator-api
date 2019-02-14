@@ -1,10 +1,13 @@
 require('dotenv').config();
 
 let express = require('express');
+let cors = require('cors');
 let app = express();
 let bodyParser = require('body-parser');
 
 let feedRoute = require('./routes/feed');
+
+app.use(cors());
 
 app.use(bodyParser.json());
 
