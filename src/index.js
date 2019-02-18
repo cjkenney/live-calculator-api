@@ -4,13 +4,17 @@ let express = require('express');
 let cors = require('cors');
 let app = express();
 let bodyParser = require('body-parser');
+let socket = require('socket.io');
 
 let feedRoute = require('./routes/feed');
+
+const PORT = process.env.PORT || 4040;
 
 app.use(cors());
 
 app.use(bodyParser.json());
 
+// Log request details to console
 app.use((req, res, next) => {
   console.log(`${new Date().toString()} => ${req.originalUrl}`);
   next();
@@ -29,7 +33,18 @@ app.use((err, req, res, next) => {
   res.status(500).send('500');
 });
 
-app.use(express.static('public'));
+let server = app.listen(PORT, () =>
+  console.info(`Server has started on ${PORT}`)
+);
 
-const PORT = process.env.PORT || 4040;
-app.listen(PORT, () => console.info(`Server has started on ${PORT}`));
+// Socket setup
+let io = socket(server);
+
+io.on('connection', client => {
+  console.log('Made socket connection', client.id);
+
+  client.on('calculation', () => {
+    client.broadcast.emit('calculation');
+    io.sockets.emit('calculation');
+  });
+});

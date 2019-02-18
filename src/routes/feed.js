@@ -1,4 +1,5 @@
 let express = require('express');
+let socket = require('socket.io');
 let router = express.Router();
 let FeedModel = require('../models/FeedModel');
 
@@ -10,6 +11,7 @@ router.post('/', (req, res) => {
   }
 
   let model = new FeedModel(req.body);
+
   model
     .save()
     .then(doc => {
@@ -19,14 +21,14 @@ router.post('/', (req, res) => {
       res.status(201).send(doc);
     })
     .catch(err => {
-      res.status(500).json(err);
+      console.log(err);
     });
 });
 
 // Get feed
 // GET /
 router.get('/', (req, res) => {
-  FeedModel.find()
+  let feedObj = FeedModel.find()
     .sort({ _id: -1 })
     .limit(10)
     .then(doc => {
@@ -35,6 +37,8 @@ router.get('/', (req, res) => {
     .catch(err => {
       res.status(500).json(err);
     });
+  socket().emit('output', feedObj);
+  return feedObj;
 });
 
 module.exports = router;
